@@ -2,11 +2,9 @@ package com.kaiser.binder.skinchange;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.View;
 
@@ -15,13 +13,11 @@ import com.kaiser.binder.skin_libs.utils.PreferencesUtils;
 
 import java.io.File;
 
-import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_NO;
-import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_YES;
-
 public class MainActivity extends SkinActivity {
     private static final String CURRENT_SKIN = "currentSkin";
     private static final String DEFAULT_SKIN_NAME = "default_package";
     private static final String DYNAMIC_SKIN_NAME = "skin_package-debug";
+    private static final String CURRENT_PATH = "currentPath";
     private String skinPath;
 
     @Override
@@ -29,7 +25,7 @@ public class MainActivity extends SkinActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        skinPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"skin_package-debug.skin";
+        skinPath = PreferencesUtils.getString(this,CURRENT_PATH,Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"skin_package-orange.skin");
         Log.e("Skin_path >>> ",skinPath);
 
         // 运行时权限申请（6.0+）
@@ -56,6 +52,7 @@ public class MainActivity extends SkinActivity {
         if(!DYNAMIC_SKIN_NAME.equals(PreferencesUtils.getString(this,CURRENT_SKIN))){
             dynamicSkin(skinPath,R.color.skin_item_color);
             PreferencesUtils.putString(this,CURRENT_SKIN,DYNAMIC_SKIN_NAME);
+            PreferencesUtils.putString(this,CURRENT_PATH,skinPath);
         }
     }
 
@@ -64,5 +61,18 @@ public class MainActivity extends SkinActivity {
             defaultSkin(R.color.colorPrimary);
             PreferencesUtils.putString(this,CURRENT_SKIN,DEFAULT_SKIN_NAME);
         }
+    }
+
+    public void changePath(View view) {
+        if(skinPath.contains("debug")){
+            skinPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"skin_package-orange.skin";
+        }else if(skinPath.contains("orange")){
+            skinPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"skin_package-red.skin";
+        }else{
+            skinPath = Environment.getExternalStorageDirectory().getAbsolutePath()+ File.separator+"skin_package-debug.skin";
+        }
+        dynamicSkin(skinPath,R.color.skin_item_color);
+        PreferencesUtils.putString(this,CURRENT_SKIN,DYNAMIC_SKIN_NAME);
+        PreferencesUtils.putString(this,CURRENT_PATH,skinPath);
     }
 }
